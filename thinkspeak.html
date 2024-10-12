@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThingSpeak Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="400" height="200"></canvas>
+    <script>
+        // ฟังก์ชันสำหรับดึงข้อมูลจาก ThingSpeak
+        async function fetchData() {
+            const response = await fetch('https://api.thingspeak.com/channels/2630720/feeds.json?results=10');
+            const data = await response.json();
+            const labels = data.feeds.map(feed => feed.created_at);
+            const values = data.feeds.map(feed => feed.field1); // เปลี่ยน field1 เป็นฟิลด์ที่คุณต้องการ
+
+            updateChart(labels, values);
+        }
+
+        // ฟังก์ชันสำหรับอัปเดตกราฟ
+        function updateChart(labels, data) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Data from ThingSpeak',
+                        data: data,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // เรียกฟังก์ชันเพื่อดึงข้อมูลเมื่อโหลดหน้า
+        fetchData();
+    </script>
+</body>
+</html>
